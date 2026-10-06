@@ -1,4 +1,5 @@
-import { Schema, model, models } from "mongoose"
+import { Schema, model } from "mongoose"
+import mongoose from "mongoose"
 
 const AlertSchema = new Schema(
   {
@@ -17,4 +18,4 @@ AlertSchema.index({ ts: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 })
 AlertSchema.index({ orgId: 1, ts: -1 })
 AlertSchema.index({ acknowledgedAt: 1 })
 
-export const AlertModel = models.Alert ?? model("Alert", AlertSchema)
+export const AlertModel = mongoose.models.Alert ?? model("Alert", AlertSchema)

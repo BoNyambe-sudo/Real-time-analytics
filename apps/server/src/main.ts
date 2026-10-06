@@ -2,6 +2,9 @@ import { NestFactory } from "@nestjs/core"
 import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger"
 import { ValidationPipe } from "@nestjs/common"
 import { AppModule } from "./app.module.js"
+import * as dns from "node:dns"
+
+dns.setServers(["8.8.8.8", "1.1.1.1"])
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: false })

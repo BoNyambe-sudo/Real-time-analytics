@@ -11,10 +11,15 @@ import { AuthModule } from "./auth/auth.module.js"
 import { GatewayModule } from "./gateway/gateway.module.js"
 import { RedisModule } from "./redis/redis.module.js"
 import { RateLimitModule } from "./rate-limit/rate-limit.module.js"
+import { fileURLToPath } from "node:url"
+import { dirname, join } from "node:path"
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: join(__dirname, "..", "..", "..", ".env") }),
     ScheduleModule.forRoot(),
     RateLimitModule,
     RedisModule,

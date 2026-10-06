@@ -4,6 +4,7 @@ import * as React from "react"
 import { cn } from "@/lib/utils"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Slot } from "@radix-ui/react-slot"
 
 interface SidebarProps {
   children: React.ReactNode
@@ -62,7 +63,7 @@ export function SidebarMenuItem({ children, className }: { children: React.React
 }
 
 export function SidebarMenuButton({ children, className, asChild, ...props }: React.ComponentPropsWithoutRef<"button"> & { asChild?: boolean }) {
-  const Comp = asChild ? React.Fragment : "button"
+  const Comp = asChild ? Slot : "button"
   return (
     <Comp className={cn("flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring", className)} {...props}>
       {children}

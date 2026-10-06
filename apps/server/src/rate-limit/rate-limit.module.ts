@@ -5,10 +5,13 @@ import { UpstashThrottlerStorage } from "../redis/upstash-throttler-storage.js"
 import { InMemoryThrottlerStorage } from "../redis/in-memory-throttler-storage.js"
 import { REDIS_CLIENT } from "../redis/redis.module.js"
 import { Redis } from "@upstash/redis"
+import { ThrottlerStorageModule } from "./throttler-storage.module.js"
 
 @Module({
   imports: [
+    ThrottlerStorageModule,
     ThrottlerModule.forRootAsync({
+      imports: [ThrottlerStorageModule],
       useFactory: (config: ConfigService, redis: Redis | null, upstashStorage: UpstashThrottlerStorage, memoryStorage: InMemoryThrottlerStorage) => {
         const storage = redis ? upstashStorage : memoryStorage
         return [
@@ -22,7 +25,6 @@ import { Redis } from "@upstash/redis"
       inject: [ConfigService, REDIS_CLIENT, UpstashThrottlerStorage, InMemoryThrottlerStorage],
     }),
   ],
-  providers: [UpstashThrottlerStorage, InMemoryThrottlerStorage],
-  exports: [ThrottlerModule, UpstashThrottlerStorage, InMemoryThrottlerStorage],
+  exports: [ThrottlerModule],
 })
 export class RateLimitModule {}

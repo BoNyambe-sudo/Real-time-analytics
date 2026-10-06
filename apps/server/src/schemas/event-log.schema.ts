@@ -1,4 +1,5 @@
-import { Schema, model, models } from "mongoose"
+import { Schema, model } from "mongoose"
+import mongoose from "mongoose"
 
 const EventLogSchema = new Schema(
   {
@@ -18,4 +19,4 @@ EventLogSchema.index({ ts: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 })
 EventLogSchema.index({ orgId: 1, ts: -1 })
 EventLogSchema.index({ level: 1 })
 
-export const EventLogModel = models.EventLog ?? model("EventLog", EventLogSchema)
+export const EventLogModel = mongoose.models.EventLog ?? model("EventLog", EventLogSchema)

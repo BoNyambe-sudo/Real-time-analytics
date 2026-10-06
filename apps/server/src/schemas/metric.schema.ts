@@ -1,4 +1,5 @@
-import { Schema, model, models } from "mongoose"
+import { Schema, model } from "mongoose"
+import mongoose from "mongoose"
 
 const MetricSchema = new Schema(
   {
@@ -16,4 +17,4 @@ const MetricSchema = new Schema(
 MetricSchema.index({ ts: 1 }, { expireAfterSeconds: 30 * 24 * 60 * 60 })
 MetricSchema.index({ orgId: 1, ts: -1 })
 
-export const MetricModel = models.Metric ?? model("Metric", MetricSchema)
+export const MetricModel = mongoose.models.Metric ?? model("Metric", MetricSchema)

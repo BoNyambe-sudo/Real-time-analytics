@@ -1,4 +1,5 @@
-import { Schema, model, models } from "mongoose"
+import { Schema, model } from "mongoose"
+import mongoose from "mongoose"
 import { createHash } from "node:crypto"
 
 function sha256(input: string): string {
@@ -34,4 +35,4 @@ ApiKeySchema.methods.verify = function (key: string): boolean {
   return sha256(key) === this.hash
 }
 
-export const ApiKeyModel = models.ApiKey ?? model("ApiKey", ApiKeySchema)
+export const ApiKeyModel = mongoose.models.ApiKey ?? model("ApiKey", ApiKeySchema)

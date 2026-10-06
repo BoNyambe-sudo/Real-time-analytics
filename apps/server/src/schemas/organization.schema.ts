@@ -1,4 +1,5 @@
-import { Schema, model, models } from "mongoose"
+import { Schema, model } from "mongoose"
+import mongoose from "mongoose"
 
 const OrganizationSchema = new Schema(
   {
@@ -10,4 +11,4 @@ const OrganizationSchema = new Schema(
 
 OrganizationSchema.index({ slug: 1 }, { unique: true })
 
-export const OrganizationModel = models.Organization ?? model("Organization", OrganizationSchema)
+export const OrganizationModel = mongoose.models.Organization ?? model("Organization", OrganizationSchema)
