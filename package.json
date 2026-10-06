@@ -1,0 +1,22 @@
+{
+  "name": "realtime-analytics-dashboard",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -n web,server -c green,blue \"pnpm --filter @realtime/web dev\" \"pnpm --filter @realtime/server dev\"",
+    "dev:web": "pnpm --filter @realtime/web dev",
+    "dev:server": "pnpm --filter @realtime/server dev",
+    "build": "pnpm --filter @realtime/shared build && pnpm --filter @realtime/server build && pnpm --filter @realtime/web build",
+    "lint": "pnpm --filter @realtime/server lint && pnpm --filter @realtime/web lint",
+    "lint:fix": "pnpm --filter @realtime/server lint:fix && pnpm --filter @realtime/web lint:fix",
+    "typecheck": "pnpm --filter @realtime/shared typecheck && pnpm --filter @realtime/server typecheck && pnpm --filter @realtime/web typecheck",
+    "test": "pnpm --filter @realtime/server test && pnpm --filter @realtime/web test",
+    "seed": "pnpm --filter @realtime/server seed"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0",
+    "typescript": "^5.9.0"
+  }
+  
+}
