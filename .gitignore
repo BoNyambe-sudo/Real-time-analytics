@@ -7,6 +7,11 @@ dist
 .next
 out
 
+# Next.js generated
+.next
+apps/web/next-env.d.ts
+apps/web/.next
+
 # Test / coverage
 coverage
 
