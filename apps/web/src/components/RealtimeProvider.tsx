@@ -5,20 +5,21 @@ import { useSocket } from "@/hooks/useSocket"
 import { useSession } from "next-auth/react"
 
 export function RealtimeProvider({ children }: { children: React.ReactNode }) {
-  const session = useSession()
-  const { connect, disconnect, joinOrg, ping } = useSocket()
+  const { data: session, status } = useSession()
+  const { connect, disconnect, joinOrg } = useSocket()
 
   useEffect(() => {
-    if (!session) return // Prerendering or loading
-    if (session.data?.user?.orgId) {
+    if (status === "loading") return
+    if (session?.user?.orgId) {
       connect()
-      joinOrg(session.data.user.orgId)
-      const interval = setInterval(ping, 10000)
-      return () => { clearInterval(interval); disconnect() }
-    } else {
-      disconnect()
+      joinOrg(session.user.orgId)
     }
-  }, [session?.data?.user?.orgId, connect, disconnect, joinOrg, ping])
+    // Don't disconnect on orgId change - let pages handle their own connection logic
+    // Just return cleanup for unmount
+    return () => {
+      // Don't disconnect here - let pages manage their own connection
+    }
+  }, [status, session?.user?.orgId, connect, joinOrg])
 
   return <>{children}</>
 }

@@ -12,12 +12,16 @@ function headers(): Record<string, string> {
 
 export async function GET(req: Request) {
   const session = await auth();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
+  if (!session)
+    return new NextResponse("Unauthorized - no session", { status: 401 });
 
   const { searchParams } = new URL(req.url);
-  const res = await fetch(`${SERVER_URL}/api/logs?${searchParams.toString()}`, {
-    headers: headers(),
-  });
+  const range = searchParams.get("range") || "24h";
+
+  const res = await fetch(
+    `${SERVER_URL}/api/metrics/timeseries?range=${range}`,
+    { headers: headers() },
+  );
   if (!res.ok)
     return new NextResponse("Failed to fetch", { status: res.status });
 

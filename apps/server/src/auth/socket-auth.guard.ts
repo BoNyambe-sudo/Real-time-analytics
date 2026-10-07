@@ -4,6 +4,7 @@ import { ApiKeyModel } from "../schemas/api-key.schema.js"
 import { MONGOOSE_CONNECTION } from "../database/mongoose.module.js"
 import { Inject } from "@nestjs/common"
 import { Socket } from "socket.io"
+import { jwtVerify } from "jose"
 
 @Injectable()
 export class SocketAuthGuard implements CanActivate {
@@ -31,9 +32,20 @@ export class SocketAuthGuard implements CanActivate {
       }
     }
 
+    const queryToken = client.handshake.query.token as string
+    if (queryToken) {
+      try {
+        const secret = new TextEncoder().encode(process.env.AUTH_SECRET!)
+        const { payload } = await jwtVerify(queryToken, secret)
+        return { id: payload.sub as string, orgId: payload.orgId as string, role: payload.role as string }
+      } catch {
+      }
+    }
+
     const apiKey = client.handshake.query.token as string
     if (apiKey) {
-      const doc = await ApiKeyModel.findOne({ revokedAt: { $exists: false } })
+      const prefix = apiKey.slice(0, 8)
+      const doc = await ApiKeyModel.findOne({ prefix, revokedAt: { $exists: false } })
       if (doc && (!doc.expiresAt || new Date() < doc.expiresAt) && doc.verify(apiKey)) {
         return { id: doc._id.toString(), orgId: doc.orgId.toString(), role: "api-key" }
       }

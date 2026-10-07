@@ -21,7 +21,7 @@ export function AlertList() {
   const { data: alerts = [], refetch } = useQuery({
     queryKey: ["alerts"],
     queryFn: async () => {
-      const res = await fetch("/api/alerts")
+      const res = await fetch("/api/alerts", { credentials: "include" })
       if (!res.ok) throw new Error("Failed to fetch alerts")
       return res.json()
     },
@@ -29,7 +29,7 @@ export function AlertList() {
   })
 
   const handleAcknowledge = async (id: string) => {
-    const res = await fetch(`/api/alerts/${id}/acknowledge`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }) })
+    const res = await fetch(`/api/alerts/${id}/acknowledge`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id }), credentials: "include" })
     if (res.ok) { toast.success("Alert acknowledged"); refetch() }
     else toast.error("Failed to acknowledge")
   }

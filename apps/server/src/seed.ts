@@ -68,6 +68,19 @@ async function seed() {
     console.log("Created loadtest API key:", key)
   }
 
+  // BFF API Key for server-to-server communication
+  let bffApiKey = await ApiKeyModel.findOne({ orgId: org._id, name: "bff" }).lean()
+  if (!bffApiKey) {
+    const key = Array.from(crypto.getRandomValues(new Uint8Array(32)))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+    const prefix = key.slice(0, 8)
+    const hash = sha256(key)
+    bffApiKey = await ApiKeyModel.create({ orgId: org._id, name: "bff", prefix, hash })
+    console.log("Created BFF API key:", key)
+    console.log("Add to .env: BFF_API_KEY=" + key)
+  }
+
   // EventLog - 10k+ rows
   const eventLogCount = await EventLogModel.countDocuments({ orgId: org._id })
   if (eventLogCount < 10000) {

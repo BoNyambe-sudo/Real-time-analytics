@@ -10,12 +10,17 @@ export class AuthGuard implements CanActivate {
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    const req = context.switchToHttp().getRequest()
+    console.log('[AuthGuard] Headers:', JSON.stringify(req.headers))
     const sessionResult = await this.sessionAuthGuard.canActivate(context)
+    console.log('[AuthGuard] SessionAuthGuard result:', sessionResult)
     if (sessionResult === true) {
       return true
     }
     if (sessionResult === false) {
-      return this.apiKeyGuard.canActivate(context)
+      const apiKeyResult = await this.apiKeyGuard.canActivate(context)
+      console.log('[AuthGuard] ApiKeyGuard result:', apiKeyResult)
+      return apiKeyResult
     }
     return false
   }

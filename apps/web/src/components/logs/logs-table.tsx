@@ -38,7 +38,7 @@ export function LogsTable() {
       params.set("sort", sort)
       if (level) params.set("level", level)
       if (debouncedSearch) params.set("q", debouncedSearch)
-      const res = await fetch(`/api/logs?${params.toString()}`)
+      const res = await fetch(`/api/logs?${params.toString()}`, { credentials: "include" })
       if (!res.ok) throw new Error("Failed to fetch logs")
       return res.json()
     },

@@ -5,6 +5,7 @@ import { loginSchema } from "@realtime/shared"
 
 const nextAuthConfig = {
   trustHost: true,
+  secret: process.env.AUTH_SECRET,
   session: { strategy: "jwt" as const },
   cookies: {
     sessionToken: {
@@ -14,6 +15,7 @@ const nextAuthConfig = {
         sameSite: "lax" as const,
         path: "/",
         secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 30, // 30 days
       },
     },
   },
@@ -37,7 +39,6 @@ const nextAuthConfig = {
     }),
   ],
   callbacks: {
-    // @ts-expect-error - loose types for callback params
     async jwt({ token, user }) {
       if (user) {
         token.sub = user.id
@@ -48,7 +49,6 @@ const nextAuthConfig = {
       }
       return token
     },
-    // @ts-expect-error - loose types for callback params
     async session({ session, token }) {
       const t = token as { sub?: string; name?: string | null; email?: string | null; orgId?: string; role?: "admin" | "viewer" }
       session.user = {
@@ -65,10 +65,10 @@ const nextAuthConfig = {
 
 const nextAuthResult = NextAuth(nextAuthConfig)
 
-export const handlers = nextAuthResult.handlers as any
-export const signIn = nextAuthResult.signIn as any
-export const signOut = nextAuthResult.signOut as any
-export const auth = nextAuthResult.auth as any
+export const handlers = nextAuthResult.handlers
+export const signIn = nextAuthResult.signIn
+export const signOut = nextAuthResult.signOut
+export const auth = nextAuthResult.auth
 
 declare module "next-auth" {
   interface Session {
