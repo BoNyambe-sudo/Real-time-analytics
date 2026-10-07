@@ -1,7 +1,7 @@
-import NextAuth from "next-auth"
-import Credentials from "next-auth/providers/credentials"
-import type { NextAuthResult } from "next-auth"
-import { loginSchema } from "@realtime/shared"
+import NextAuth from "next-auth";
+import Credentials from "next-auth/providers/credentials";
+import type { NextAuthResult } from "next-auth";
+import { loginSchema } from "@realtime/shared";
 
 const nextAuthConfig = {
   trustHost: true,
@@ -9,7 +9,10 @@ const nextAuthConfig = {
   session: { strategy: "jwt" as const },
   cookies: {
     sessionToken: {
-      name: process.env.NODE_ENV === "production" ? "__Secure-authjs.session-token" : "authjs.session-token",
+      name:
+        process.env.NODE_ENV === "production"
+          ? "__Secure-authjs.session-token"
+          : "authjs.session-token",
       options: {
         httpOnly: true,
         sameSite: "lax" as const,
@@ -23,69 +26,75 @@ const nextAuthConfig = {
     Credentials({
       credentials: { email: {}, password: {} },
       async authorize(credentials) {
-        const parsed = loginSchema.safeParse(credentials)
-        if (!parsed.success) throw new Error("Invalid credentials")
+        const parsed = loginSchema.safeParse(credentials);
+        if (!parsed.success) throw new Error("Invalid credentials");
 
         const res = await fetch(`${process.env.SERVER_URL}/api/auth/login`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(parsed.data),
-        })
+        });
 
-        if (!res.ok) return null
-        const user = await res.json()
-        return user
+        if (!res.ok) return null;
+        const user = await res.json();
+        return user;
       },
     }),
   ],
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
-        token.sub = user.id
-        token.name = user.name
-        token.email = user.email
-        token.orgId = user.orgId
-        token.role = user.role
+        token.sub = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.orgId = user.orgId;
+        token.role = user.role;
       }
-      return token
+      return token;
     },
     async session({ session, token }) {
-      const t = token as { sub?: string; name?: string | null; email?: string | null; orgId?: string; role?: "admin" | "viewer" }
+      const t = token as {
+        sub?: string;
+        name?: string | null;
+        email?: string | null;
+        orgId?: string;
+        role?: "admin" | "viewer";
+      };
       session.user = {
         id: t.sub || "",
         name: t.name ?? null,
         email: t.email ?? null,
         orgId: t.orgId || "",
         role: t.role || "viewer",
-      } as typeof session.user
-      return session
+      } as typeof session.user;
+      return session;
     },
   },
-}
+};
 
-const nextAuthResult = NextAuth(nextAuthConfig)
+const nextAuthResult = NextAuth(nextAuthConfig);
 
-export const handlers = nextAuthResult.handlers
-export const signIn = nextAuthResult.signIn
-export const signOut = nextAuthResult.signOut
-export const auth = nextAuthResult.auth
+export const handlers = nextAuthResult.handlers;
+export const signIn = nextAuthResult.signIn;
+export const signOut = nextAuthResult.signOut;
+export const auth = nextAuthResult.auth;
 
 declare module "next-auth" {
   interface Session {
     user: {
-      id: string
-      name?: string | null
-      email?: string | null
-      orgId: string
-      role: "admin" | "viewer"
-    }
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      orgId: string;
+      role: "admin" | "viewer";
+    };
   }
   interface User {
-    orgId: string
-    role: "admin" | "viewer"
+    orgId: string;
+    role: "admin" | "viewer";
   }
   interface JWT {
-    orgId: string
-    role: "admin" | "viewer"
+    orgId: string;
+    role: "admin" | "viewer";
   }
 }

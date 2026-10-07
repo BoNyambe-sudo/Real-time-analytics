@@ -1,25 +1,25 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import { useSocket } from "@/hooks/useSocket"
-import { useSession } from "next-auth/react"
+import { useEffect } from "react";
+import { useSocket } from "@/hooks/useSocket";
+import { useSession } from "next-auth/react";
 
 export function RealtimeProvider({ children }: { children: React.ReactNode }) {
-  const { data: session, status } = useSession()
-  const { connect, disconnect, joinOrg } = useSocket()
+  const { data: session, status } = useSession();
+  const { connect, disconnect, joinOrg } = useSocket();
 
   useEffect(() => {
-    if (status === "loading") return
+    if (status === "loading") return;
     if (session?.user?.orgId) {
-      connect()
-      joinOrg(session.user.orgId)
+      connect();
+      joinOrg(session.user.orgId);
     }
     // Don't disconnect on orgId change - let pages handle their own connection logic
     // Just return cleanup for unmount
     return () => {
       // Don't disconnect here - let pages manage their own connection
-    }
-  }, [status, session?.user?.orgId, connect, joinOrg])
+    };
+  }, [status, session?.user?.orgId, connect, joinOrg]);
 
-  return <>{children}</>
+  return <>{children}</>;
 }
