@@ -141,6 +141,9 @@ importers:
       clsx:
         specifier: ^2.1.0
         version: 2.1.1
+      jose:
+        specifier: ^6.2.12
+        version: 6.2.12
       lucide-react:
         specifier: ^0.454.0
         version: 0.454.0(react@19.3.0)
