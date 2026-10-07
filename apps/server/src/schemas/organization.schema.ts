@@ -9,6 +9,4 @@ const OrganizationSchema = new Schema(
   { timestamps: true, versionKey: false }
 )
 
-OrganizationSchema.index({ slug: 1 }, { unique: true })
-
 export const OrganizationModel = mongoose.models.Organization ?? model("Organization", OrganizationSchema)

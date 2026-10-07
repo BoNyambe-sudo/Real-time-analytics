@@ -3,12 +3,12 @@ import mongoose from "mongoose"
 
 const AlertSchema = new Schema(
   {
-    orgId: { type: Schema.Types.ObjectId, ref: "Organization", required: true, index: true },
+    orgId: { type: Schema.Types.ObjectId, ref: "Organization", required: true },
     type: { type: String, required: true },
     message: { type: String, required: true },
     value: { type: Number, required: true },
     threshold: { type: Number, required: true },
-    ts: { type: Date, required: true, index: true },
+    ts: { type: Date, required: true },
     acknowledgedAt: { type: Date },
   },
   { timestamps: false, versionKey: false }

@@ -1,5 +1,18 @@
 import { createHash } from "node:crypto"
 import bcrypt from "bcrypt"
+import { config } from "dotenv"
+import { dirname, join } from "node:path"
+import { fileURLToPath } from "node:url"
+import * as dns from "node:dns"
+
+dns.setServers(["8.8.8.8", "1.1.1.1"])
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+
+// Load env from root directory
+config({ path: join(__dirname, "..", "..", "..", ".env") })
+
 import { MONGOOSE_CONNECTION } from "./database/mongoose.module.js"
 import { UserModel } from "./schemas/user.schema.js"
 import { OrganizationModel } from "./schemas/organization.schema.js"
@@ -63,7 +76,7 @@ async function seed() {
     const batches = Math.ceil(totalToCreate / batchSize)
 
     for (let b = 0; b < batches; b++) {
-      const docs = Array.from({ length: batchSize }, () => ({
+      const batchDocs = Array.from({ length: batchSize }, () => ({
         orgId: org._id,
         ts: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000),
         level: LEVELS[Math.floor(Math.random() * LEVELS.length)],
@@ -73,7 +86,7 @@ async function seed() {
         latencyMs: Math.floor(Math.random() * 500) + 10,
         meta: { requestId: crypto.randomUUID() },
       }))
-      await EventLogModel.insertMany(docs)
+      await EventLogModel.insertMany(batchDocs)
       console.log(`Seeded ${Math.min((b + 1) * batchSize, totalToCreate)} event logs`)
     }
   }

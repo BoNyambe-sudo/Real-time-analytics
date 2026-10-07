@@ -12,6 +12,4 @@ const UserSchema = new Schema(
   { timestamps: true, versionKey: false }
 )
 
-UserSchema.index({ email: 1 }, { unique: true })
-
 export const UserModel = mongoose.models.User ?? model("User", UserSchema)

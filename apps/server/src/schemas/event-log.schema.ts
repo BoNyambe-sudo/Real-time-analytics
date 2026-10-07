@@ -3,8 +3,8 @@ import mongoose from "mongoose"
 
 const EventLogSchema = new Schema(
   {
-    orgId: { type: Schema.Types.ObjectId, ref: "Organization", required: true, index: true },
-    ts: { type: Date, required: true, index: true },
+    orgId: { type: Schema.Types.ObjectId, ref: "Organization", required: true },
+    ts: { type: Date, required: true },
     level: { type: String, enum: ["info", "warn", "error"], required: true },
     message: { type: String, required: true, maxlength: 2000 },
     path: { type: String, required: true, maxlength: 500 },

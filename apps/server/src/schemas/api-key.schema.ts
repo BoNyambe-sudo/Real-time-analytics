@@ -8,7 +8,7 @@ function sha256(input: string): string {
 
 const ApiKeySchema = new Schema(
   {
-    orgId: { type: Schema.Types.ObjectId, ref: "Organization", required: true, index: true },
+    orgId: { type: Schema.Types.ObjectId, ref: "Organization", required: true },
     name: { type: String, required: true, maxlength: 120 },
     prefix: { type: String, required: true, maxlength: 8 },
     hash: { type: String, required: true },

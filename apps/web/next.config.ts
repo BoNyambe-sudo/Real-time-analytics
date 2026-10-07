@@ -1,13 +1,10 @@
-import type { NextConfig } from "next"
-
-const serverUrl = process.env.SERVER_URL || "http://localhost:4000"
-
-const nextConfig: NextConfig = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   async rewrites() {
     return [
-      { source: "/socket.io/:path*", destination: `${serverUrl}/socket.io/:path*` },
+      { source: "/socket.io/:path*", destination: "http://localhost:4000/socket.io/:path*" },
     ]
   },
 }
 
-export default nextConfig
+module.exports = nextConfig
