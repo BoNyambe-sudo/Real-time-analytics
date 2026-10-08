@@ -37,6 +37,7 @@ export function AlertList() {
       const res = await fetch(`/api/alerts/${id}/acknowledge`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to acknowledge alert");

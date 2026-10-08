@@ -31,11 +31,10 @@ export function SidebarProvider({
   const toggle = () => {
     const next = !collapsed;
     setCollapsed(next);
-    if (collapsible === "icon") setOpen(next);
   };
 
   return (
-    <SidebarContext.Provider value={{ open, collapsed, toggle, collapsible }}>
+    <SidebarContext.Provider value={{ open, setOpen, collapsed, toggle, collapsible }}>
       <div className="flex h-screen">{children}</div>
     </SidebarContext.Provider>
   );
@@ -43,6 +42,7 @@ export function SidebarProvider({
 
 const SidebarContext = React.createContext<{
   open: boolean;
+  setOpen: (open: boolean) => void;
   collapsed: boolean;
   toggle: () => void;
   collapsible: "none" | "icon";
@@ -65,7 +65,7 @@ export function Sidebar({
   children: React.ReactNode;
   className?: string;
 }) {
-  const { collapsed, collapsible } = useSidebarContext();
+  const { collapsed, collapsible, open } = useSidebarContext();
 
   return (
     <div
@@ -74,24 +74,10 @@ export function Sidebar({
         className,
         collapsed && collapsible === "icon" && "w-16",
         !collapsed && "w-64",
+        !open && "lg:block lg:visible lg:translate-x-0 -translate-x-full",
       )}
     >
       {children}
-      {collapsible === "icon" && (
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute right-0 top-1/2 -translate-y-1/2 -translate-x-1/2 h-8 w-8 rounded-full border"
-          onClick={useSidebarContext().toggle}
-          aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        >
-          {collapsed ? (
-            <ChevronRight className="h-4 w-4" />
-          ) : (
-            <ChevronLeft className="h-4 w-4" />
-          )}
-        </Button>
-      )}
     </div>
   );
 }

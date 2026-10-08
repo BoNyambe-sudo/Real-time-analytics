@@ -10,16 +10,23 @@ function headers(): Record<string, string> {
   return h;
 }
 
-export async function GET(req: Request) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const session = await auth();
   if (!session?.user?.orgId) return new NextResponse("Unauthorized", { status: 401 });
 
-  const res = await fetch(`${SERVER_URL}/api/alerts`, { 
+  const { id } = await params;
+  const body = await req.json();
+  const res = await fetch(`${SERVER_URL}/api/alerts/${id}/acknowledge`, {
+    method: "PATCH",
     headers: headers(),
-    credentials: "include"
+    credentials: "include",
+    body: JSON.stringify(body),
   });
   if (!res.ok)
-    return new NextResponse("Failed to fetch", { status: res.status });
+    return new NextResponse("Failed to acknowledge", { status: res.status });
 
   const data = await res.json();
   return NextResponse.json(data);

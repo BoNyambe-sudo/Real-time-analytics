@@ -95,7 +95,7 @@ export function LogsTable() {
           </TableHeader>
           <TableBody>
             {[...Array(10)].map((_, i) => (
-              <TableRow key={i}>
+              <TableRow key={i} className="h-12">
                 <TableCell>
                   <Skeleton className="h-4 w-24" />
                 </TableCell>
@@ -193,7 +193,11 @@ export function LogsTable() {
               return (
                 <TableRow
                   key={virtualRow.index}
-                  style={{ transform: `translateY(${virtualRow.start}px)` }}
+                  style={{ 
+                    transform: `translateY(${virtualRow.start}px)`,
+                    height: '48px',
+                  }}
+                  className="h-12"
                 >
                   <TableCell className="font-mono text-xs hidden sm:table-cell">
                     {new Date(log.ts).toLocaleTimeString()}
