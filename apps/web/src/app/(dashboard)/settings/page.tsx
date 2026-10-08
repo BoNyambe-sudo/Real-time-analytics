@@ -101,7 +101,7 @@ export default function SettingsPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
       </div>
     );
@@ -109,13 +109,13 @@ export default function SettingsPage() {
 
   if (!session)
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex h-[60vh] items-center justify-center">
         Loading...
       </div>
     );
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Profile</CardTitle>

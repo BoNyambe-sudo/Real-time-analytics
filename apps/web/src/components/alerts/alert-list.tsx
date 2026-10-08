@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ interface Alert {
 
 export function AlertList() {
   const queryClient = useQueryClient();
+  const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
 
   const { data: alerts = [], isLoading, refetch } = useQuery<Alert[]>({
     queryKey: ["alerts"],
@@ -35,7 +37,6 @@ export function AlertList() {
       const res = await fetch(`/api/alerts/${id}/acknowledge`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
         credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to acknowledge alert");
@@ -44,13 +45,16 @@ export function AlertList() {
     onSuccess: () => {
       toast.success("Alert acknowledged");
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
+      setAcknowledgingId(null);
     },
     onError: () => {
       toast.error("Failed to acknowledge alert");
+      setAcknowledgingId(null);
     },
   });
 
   const handleAcknowledge = (id: string) => {
+    setAcknowledgingId(id);
     acknowledgeMutation.mutate(id);
   };
 
@@ -80,47 +84,50 @@ export function AlertList() {
 
   return (
     <div className="space-y-4">
-      {alerts.map((alert: Alert) => (
-        <Card key={alert._id} className="border-l-4 border-destructive">
-          <CardContent className="pt-6">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
-                  <span className="font-medium truncate">{alert.message}</span>
-                  {!alert.acknowledgedAt && (
-                    <Badge variant="destructive" className="flex-shrink-0">Active</Badge>
-                  )}
-                  {alert.acknowledgedAt && (
-                    <Badge variant="secondary" className="flex-shrink-0">Acknowledged</Badge>
-                  )}
+      {alerts.map((alert: Alert) => {
+        const isAcknowledging = acknowledgingId === alert._id;
+        return (
+          <Card key={alert._id} className="border-l-4 border-destructive">
+            <CardContent className="pt-6">
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-2 flex-wrap">
+                    <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
+                    <span className="font-medium truncate">{alert.message}</span>
+                    {!alert.acknowledgedAt && (
+                      <Badge variant="destructive" className="flex-shrink-0">Active</Badge>
+                    )}
+                    {alert.acknowledgedAt && (
+                      <Badge variant="secondary" className="flex-shrink-0">Acknowledged</Badge>
+                    )}
+                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    Value: {alert.value}% • Threshold: {alert.threshold}% •{" "}
+                    {new Date(alert.ts).toLocaleString()}
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  Value: {alert.value}% • Threshold: {alert.threshold}% •{" "}
-                  {new Date(alert.ts).toLocaleString()}
-                </p>
+                {!alert.acknowledgedAt && (
+                  <Button
+                    size="sm"
+                    onClick={() => handleAcknowledge(alert._id)}
+                    disabled={isAcknowledging || acknowledgeMutation.isPending}
+                    className="flex-shrink-0"
+                  >
+                    {isAcknowledging ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <>
+                        <CheckCircle2 className="h-4 w-4 mr-2" />
+                        Acknowledge
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
-              {!alert.acknowledgedAt && (
-                <Button
-                  size="sm"
-                  onClick={() => handleAcknowledge(alert._id)}
-                  disabled={acknowledgeMutation.isPending}
-                  className="flex-shrink-0"
-                >
-                  {acknowledgeMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <>
-                      <CheckCircle2 className="h-4 w-4 mr-2" />
-                      Acknowledge
-                    </>
-                  )}
-                </Button>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

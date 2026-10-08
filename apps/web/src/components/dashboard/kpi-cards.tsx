@@ -42,16 +42,16 @@ export function KPICards({ summary }: KPICardsProps) {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 grid-cols-1 lg:grid-cols-2">
       {cards.map((card, i) => (
         <Card key={i}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{card.label}</p>
-                <p className="text-2xl font-bold mt-1">{card.value}</p>
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between gap-4 min-w-0">
+              <div className="min-w-0 flex-1">
+                <p className="text-sm text-muted-foreground truncate">{card.label}</p>
+                <p className="text-xl sm:text-2xl font-bold mt-1 truncate">{card.value}</p>
               </div>
-              <div className={cn("p-3 rounded-xl", card.color)}>
+              <div className={cn("p-3 rounded-xl flex-shrink-0", card.color)}>
                 <card.Icon className="h-6 w-6" />
               </div>
             </div>

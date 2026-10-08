@@ -56,6 +56,8 @@ function useSidebarContext() {
   return context;
 }
 
+export { useSidebarContext };
+
 export function Sidebar({
   children,
   className,

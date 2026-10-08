@@ -2,8 +2,6 @@
 
 @layer ng-icon, theme, base, components, utilities;
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --radius: 0.625rem;
   --background: oklch(1 0 0);
@@ -121,7 +119,7 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground dark;
+    @apply bg-background text-foreground;
   }
 
   input[type="number"]::-webkit-inner-spin-button,

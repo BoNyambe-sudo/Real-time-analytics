@@ -16,17 +16,63 @@ import {
   SidebarMenuItem, 
   SidebarMenuButton,
   SidebarMain,
-  SidebarHeader
+  SidebarHeader,
+  useSidebarContext
 } from "@/components/ui/sidebar"
-import { LayoutDashboard, List, AlertTriangle, Settings, LogOut, ChevronLeft, Menu } from "lucide-react"
+import { LayoutDashboard, List, AlertTriangle, Settings, LogOut, Menu } from "lucide-react"
 import { RealtimeProvider } from "@/components/RealtimeProvider"
 
 const navigation = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { name: "Logs", href: "/dashboard/logs", icon: List },
   { name: "Alerts", href: "/dashboard/alerts", icon: AlertTriangle },
-  { name: "Settings", href: "/settings", icon: Settings },
+  { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ]
+
+function SidebarNav() {
+  const pathname = usePathname()
+  const { collapsed } = useSidebarContext()
+
+  return (
+    <>
+      <SidebarGroup>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <div className="flex h-16 items-center px-4 border-b">
+              <Link href="/dashboard" className="font-bold text-xl">{collapsed ? null : "Analytics"}</Link>
+            </div>
+          </SidebarMenuItem>
+          {navigation.map((item) => (
+            <SidebarMenuItem key={item.name}>
+              <SidebarMenuButton asChild>
+                <Link
+                  href={item.href}
+                  className={cn(
+                    "transition-colors",
+                    pathname === item.href && "bg-primary text-primary-foreground"
+                  )}
+                >
+                  <item.icon className="mr-2 h-4 w-4 flex-shrink-0" />
+                  {!collapsed && <span>{item.name}</span>}
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
+        </SidebarMenu>
+      </SidebarGroup>
+      <SidebarFooter>
+        <Button
+          variant="ghost"
+          className="w-full justify-start"
+          onClick={() => signOut({ callbackUrl: "/login" })}
+        >
+          <LogOut className="mr-2 h-4 w-4" />
+          {!collapsed && <span>Sign out</span>}
+        </Button>
+      </SidebarFooter>
+    </>
+  )
+}
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -37,41 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <SidebarProvider defaultOpen={true} collapsible="icon">
         <Sidebar>
           <SidebarContent>
-            <SidebarGroup>
-              <SidebarMenu>
-                <SidebarMenuItem>
-                  <div className="flex h-16 items-center px-4 border-b">
-                    <Link href="/dashboard" className="font-bold text-xl">Analytics</Link>
-                  </div>
-                </SidebarMenuItem>
-                {navigation.map((item) => (
-                  <SidebarMenuItem key={item.name}>
-                    <SidebarMenuButton asChild>
-                      <Link
-                        href={item.href}
-                        className={cn(
-                          "transition-colors",
-                          pathname === item.href && "bg-primary text-primary-foreground"
-                        )}
-                      >
-                        <item.icon className="mr-2 h-4 w-4 flex-shrink-0" />
-                        {item.name}
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroup>
-            <SidebarFooter>
-              <Button
-                variant="ghost"
-                className="w-full justify-start"
-                onClick={() => signOut({ callbackUrl: "/login" })}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Sign out
-              </Button>
-            </SidebarFooter>
+            <SidebarNav />
           </SidebarContent>
         </Sidebar>
         <SidebarMain>
