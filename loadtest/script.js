@@ -26,6 +26,7 @@ export const options = {
       executor: "constant-arrival-rate",
       rate: 50,
       timeUnit: "1s",
+      duration: "2m",
       preAllocatedVUs: 50,
       maxVUs: 250,
       exec: "restScenario",
@@ -38,7 +39,7 @@ export const options = {
   },
 }
 
-function wsScenario() {
+export function wsScenario() {
   const wsUrl = `${SERVER_URL.replace(/^http/, "ws")}/socket.io/?EIO=4&transport=websocket&token=${API_KEY}`
   let wsConnected = false
   let messageCount = 0
@@ -90,7 +91,7 @@ function wsScenario() {
   }
 }
 
-function restScenario() {
+export function restScenario() {
   const headers = { "x-api-key": API_KEY }
   const res = http.get(`${SERVER_URL}/api/metrics/summary`, { headers })
   check(res, {

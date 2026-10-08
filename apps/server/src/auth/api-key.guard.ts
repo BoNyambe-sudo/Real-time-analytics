@@ -11,18 +11,13 @@ export class ApiKeyGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const key = req.headers['x-api-key'] || this.extractBearer(req.headers.authorization);
 
-    console.log('[ApiKeyGuard] x-api-key header:', req.headers['x-api-key']);
-    console.log('[ApiKeyGuard] authorization header:', req.headers.authorization);
-    console.log('[ApiKeyGuard] extracted key:', key ? 'present' : 'null');
 
     if (!key) {
-      console.log('[ApiKeyGuard] No key found, returning false');
       return false;
     }
 
     const apiKey = await this.verifyApiKey(key);
     if (!apiKey) {
-      console.log('[ApiKeyGuard] verifyApiKey returned null, throwing UnauthorizedException');
       throw new UnauthorizedException('Invalid API key');
     }
 
@@ -32,20 +27,16 @@ export class ApiKeyGuard implements CanActivate {
       role: 'api-key',
       apiKey: true,
     };
-    console.log('[ApiKeyGuard] Success, user:', req.user);
     return true;
   }
 
   private async verifyApiKey(key: string) {
     const prefix = key.slice(0, 8);
-    console.log('[ApiKeyGuard] Looking up prefix:', prefix);
     const doc = await ApiKeyModel.findOne({ prefix, revokedAt: { $exists: false } });
-    console.log('[ApiKeyGuard] Found doc:', doc ? 'yes' : 'no');
     if (!doc) return null;
 
     if (doc.expiresAt && new Date() > doc.expiresAt) return null;
     if (!doc.verify(key)) {
-      console.log('[ApiKeyGuard] Key verification failed');
       return null;
     }
 
