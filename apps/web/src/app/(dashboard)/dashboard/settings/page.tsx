@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useSession, signOut } from "next-auth/react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut, Key, Plus, RotateCcw, Trash2, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
+import { useSession, signOut } from 'next-auth/react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { LogOut, Key, Plus, RotateCcw, Trash2, Loader2 } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 interface ApiKey {
   _id: string;
@@ -18,24 +18,25 @@ interface ApiKey {
   createdAt: string;
   revokedAt?: string;
   expiresAt?: string;
+  isDefault?: boolean;
 }
 
 export default function SettingsPage() {
   const { data: session, status } = useSession();
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [loading, setLoading] = useState(false);
-  const [newKeyName, setNewKeyName] = useState("");
+  const [newKeyName, setNewKeyName] = useState('');
 
   useEffect(() => {
-    if (status === "authenticated") fetchApiKeys();
+    if (status === 'authenticated') fetchApiKeys();
   }, [status]);
 
   const fetchApiKeys = async () => {
     try {
-      const res = await fetch("/api/api-keys", { credentials: "include" });
+      const res = await fetch('/api/api-keys', { credentials: 'include' });
       if (res.ok) setApiKeys(await res.json());
     } catch (error) {
-      console.error("Failed to fetch API keys:", error);
+      console.error('Failed to fetch API keys:', error);
     }
   };
 
@@ -44,22 +45,22 @@ export default function SettingsPage() {
     if (!newKeyName.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/api-keys", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const res = await fetch('/api/api-keys', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newKeyName }),
-        credentials: "include",
+        credentials: 'include',
       });
       if (res.ok) {
         const data = await res.json();
-        toast.success("API key created", { description: data.key });
+        toast.success('API key created', { description: data.key });
         fetchApiKeys();
-        setNewKeyName("");
+        setNewKeyName('');
       } else {
-        toast.error("Failed to create key");
+        toast.error('Failed to create key');
       }
     } catch {
-      toast.error("Failed to create key");
+      toast.error('Failed to create key');
     } finally {
       setLoading(false);
     }
@@ -68,13 +69,13 @@ export default function SettingsPage() {
   const handleRevoke = async (id: string) => {
     try {
       await fetch(`/api/api-keys/${id}`, {
-        method: "DELETE",
-        credentials: "include",
+        method: 'DELETE',
+        credentials: 'include',
       });
       fetchApiKeys();
-      toast.success("API key revoked");
+      toast.success('API key revoked');
     } catch {
-      toast.error("Failed to revoke key");
+      toast.error('Failed to revoke key');
     }
   };
 
@@ -82,24 +83,41 @@ export default function SettingsPage() {
     setLoading(true);
     try {
       const res = await fetch(`/api/api-keys/${id}/regenerate`, {
-        method: "PATCH",
-        credentials: "include",
+        method: 'PATCH',
+        credentials: 'include',
       });
       if (res.ok) {
         const data = await res.json();
-        toast.success("API key regenerated", { description: data.key });
+        toast.success('API key regenerated', { description: data.key });
         fetchApiKeys();
       } else {
-        toast.error("Failed to regenerate key");
+        toast.error('Failed to regenerate key');
       }
     } catch {
-      toast.error("Failed to regenerate key");
+      toast.error('Failed to regenerate key');
     } finally {
       setLoading(false);
     }
   };
 
-  if (status === "loading") {
+  const handleSetDefault = async (id: string) => {
+    try {
+      const res = await fetch(`/api/api-keys/${id}/default`, {
+        method: 'PATCH',
+        credentials: 'include',
+      });
+      if (res.ok) {
+        toast.success('Default API key updated');
+        fetchApiKeys();
+      } else {
+        toast.error('Failed to set default key');
+      }
+    } catch {
+      toast.error('Failed to set default key');
+    }
+  };
+
+  if (status === 'loading') {
     return (
       <div className="flex h-[60vh] items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin" />
@@ -107,12 +125,7 @@ export default function SettingsPage() {
     );
   }
 
-  if (!session)
-    return (
-      <div className="flex h-[60vh] items-center justify-center">
-        Loading...
-      </div>
-    );
+  if (!session) return <div className="flex h-[60vh] items-center justify-center">Loading...</div>;
 
   return (
     <div className="space-y-6">
@@ -124,24 +137,24 @@ export default function SettingsPage() {
           <div className="grid gap-4 md:grid-cols-2">
             <div>
               <Label>Name</Label>
-              <Input value={session.user?.name || ""} disabled />
+              <Input value={session.user?.name || ''} disabled />
             </div>
             <div>
               <Label>Email</Label>
-              <Input value={session.user?.email || ""} disabled />
+              <Input value={session.user?.email || ''} disabled />
             </div>
             <div>
               <Label>Role</Label>
-              <Input value={session.user?.role || ""} disabled />
+              <Input value={session.user?.role || ''} disabled />
             </div>
             <div>
               <Label>Organization</Label>
-              <Input value={session.user?.orgId || ""} disabled />
+              <Input value={session.user?.orgId || ''} disabled />
             </div>
           </div>
           <Button
             variant="outline"
-            onClick={() => signOut({ callbackUrl: "/login" })}
+            onClick={() => signOut({ callbackUrl: '/login' })}
             className="w-full sm:w-auto"
           >
             <LogOut className="mr-2 h-4 w-4" /> Sign out
@@ -158,11 +171,15 @@ export default function SettingsPage() {
             <Input
               placeholder="Key name"
               value={newKeyName}
-              onChange={(e) => setNewKeyName(e.target.value)}
+              onChange={e => setNewKeyName(e.target.value)}
               className="flex-1"
               disabled={loading}
             />
-            <Button type="submit" disabled={loading || !newKeyName.trim()} className="w-full sm:w-auto">
+            <Button
+              type="submit"
+              disabled={loading || !newKeyName.trim()}
+              className="w-full sm:w-auto"
+            >
               {loading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
@@ -176,12 +193,12 @@ export default function SettingsPage() {
             {apiKeys.length === 0 ? (
               <p className="text-muted-foreground text-center py-4">No API keys</p>
             ) : (
-              apiKeys.map((key) => (
+              apiKeys.map(key => (
                 <div
                   key={key._id}
                   className={cn(
-                    "flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 border rounded-lg",
-                    key.revokedAt && "opacity-50"
+                    'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 border rounded-lg',
+                    key.revokedAt && 'opacity-50'
                   )}
                 >
                   <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -189,10 +206,10 @@ export default function SettingsPage() {
                     <div className="min-w-0">
                       <p className="font-medium truncate">{key.name}</p>
                       <p className="text-sm text-muted-foreground truncate">
-                        {key.prefix}•••••••• •{" "}
+                        {key.prefix}•••••••• •{' '}
                         {key.lastUsedAt
                           ? new Date(key.lastUsedAt).toLocaleDateString()
-                          : "Never used"}
+                          : 'Never used'}
                         {key.expiresAt && (
                           <> • Expires: {new Date(key.expiresAt).toLocaleDateString()}</>
                         )}
@@ -204,6 +221,21 @@ export default function SettingsPage() {
                   </div>
                   {!key.revokedAt && (
                     <div className="flex items-center gap-2 flex-wrap">
+                      {key.isDefault ? (
+                        <span className="px-2 py-1 text-xs bg-primary/20 text-primary rounded-full flex-shrink-0">
+                          Default
+                        </span>
+                      ) : (
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleSetDefault(key._id)}
+                          title="Set as default"
+                          disabled={loading}
+                        >
+                          <Key className="h-4 w-4" />
+                        </Button>
+                      )}
                       <Button
                         variant="ghost"
                         size="icon"

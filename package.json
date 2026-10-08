@@ -12,11 +12,13 @@
     "lint:fix": "pnpm --filter @realtime/server lint:fix && pnpm --filter @realtime/web lint:fix",
     "typecheck": "pnpm --filter @realtime/shared typecheck && pnpm --filter @realtime/server typecheck && pnpm --filter @realtime/web typecheck",
     "test": "pnpm --filter @realtime/server test && pnpm --filter @realtime/web test",
-    "seed": "pnpm --filter @realtime/server seed"
+    "seed": "pnpm --filter @realtime/server seed",
+    "format": "prettier --write \"**/*.{ts,tsx,json,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json,md,yml,yaml}\""
   },
   "devDependencies": {
     "concurrently": "^9.0.0",
+    "prettier": "^3.3.0",
     "typescript": "^5.9.0"
   }
-  
 }

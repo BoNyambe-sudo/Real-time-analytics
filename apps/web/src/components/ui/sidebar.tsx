@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import * as React from "react";
-import { cn } from "@/lib/utils";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Slot } from "@radix-ui/react-slot";
+import * as React from 'react';
+import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Slot } from '@radix-ui/react-slot';
 
 interface SidebarProps {
   children: React.ReactNode;
   className?: string;
-  collapsible?: "none" | "icon";
+  collapsible?: 'none' | 'icon';
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
 }
@@ -17,13 +17,13 @@ interface SidebarProps {
 interface SidebarProviderProps {
   children: React.ReactNode;
   defaultOpen?: boolean;
-  collapsible?: "none" | "icon";
+  collapsible?: 'none' | 'icon';
 }
 
 export function SidebarProvider({
   children,
   defaultOpen = true,
-  collapsible = "icon",
+  collapsible = 'icon',
 }: SidebarProviderProps) {
   const [open, setOpen] = React.useState(defaultOpen);
   const [collapsed, setCollapsed] = React.useState(!defaultOpen);
@@ -45,13 +45,13 @@ const SidebarContext = React.createContext<{
   setOpen: (open: boolean) => void;
   collapsed: boolean;
   toggle: () => void;
-  collapsible: "none" | "icon";
+  collapsible: 'none' | 'icon';
 } | null>(null);
 
 function useSidebarContext() {
   const context = React.useContext(SidebarContext);
   if (!context) {
-    throw new Error("Sidebar components must be used within SidebarProvider");
+    throw new Error('Sidebar components must be used within SidebarProvider');
   }
   return context;
 }
@@ -70,11 +70,12 @@ export function Sidebar({
   return (
     <div
       className={cn(
-        "flex flex-col h-screen bg-card border-r transition-all duration-200",
+        'flex flex-col h-screen bg-card border-r transition-all duration-200',
         className,
-        collapsed && collapsible === "icon" && "w-16",
-        !collapsed && "w-64",
-        !open && "lg:block lg:visible lg:translate-x-0 -translate-x-full",
+        collapsed && collapsible === 'icon' && 'w-16',
+        !collapsed && 'w-64',
+        !open && 'lg:block lg:visible lg:translate-x-0 -translate-x-full',
+        open && 'translate-x-0'
       )}
     >
       {children}
@@ -89,11 +90,7 @@ export function SidebarContent({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={cn("flex flex-col flex-1 overflow-y-auto", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('flex flex-col flex-1 overflow-y-auto', className)}>{children}</div>;
 }
 
 export function SidebarFooter({
@@ -103,11 +100,7 @@ export function SidebarFooter({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={cn("flex flex-col space-y-2 p-2", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('flex flex-col space-y-2 p-2', className)}>{children}</div>;
 }
 
 export function SidebarGroup({
@@ -117,11 +110,7 @@ export function SidebarGroup({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={cn("flex flex-col space-y-2 p-2", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('flex flex-col space-y-2 p-2', className)}>{children}</div>;
 }
 
 export function SidebarMenu({
@@ -131,9 +120,7 @@ export function SidebarMenu({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={cn("flex flex-col space-y-1", className)}>{children}</div>
-  );
+  return <div className={cn('flex flex-col space-y-1', className)}>{children}</div>;
 }
 
 export function SidebarMenuItem({
@@ -143,7 +130,7 @@ export function SidebarMenuItem({
   children: React.ReactNode;
   className?: string;
 }) {
-  return <div className={cn("", className)}>{children}</div>;
+  return <div className={cn('', className)}>{children}</div>;
 }
 
 export function SidebarMenuButton({
@@ -151,15 +138,15 @@ export function SidebarMenuButton({
   className,
   asChild,
   ...props
-}: React.ComponentPropsWithoutRef<"button"> & { asChild?: boolean }) {
+}: React.ComponentPropsWithoutRef<'button'> & { asChild?: boolean }) {
   const { collapsed } = useSidebarContext();
-  const Comp = asChild ? Slot : "button";
+  const Comp = asChild ? Slot : 'button';
   return (
     <Comp
       className={cn(
-        "flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring",
+        'flex items-center gap-2 rounded-md px-2 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring',
         className,
-        collapsed && "justify-center px-1",
+        collapsed && 'justify-center px-1'
       )}
       {...props}
     >
@@ -175,11 +162,7 @@ export function SidebarMain({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <div className={cn("flex flex-col flex-1 overflow-hidden", className)}>
-      {children}
-    </div>
-  );
+  return <div className={cn('flex flex-col flex-1 overflow-hidden', className)}>{children}</div>;
 }
 
 export function SidebarHeader({
@@ -190,7 +173,12 @@ export function SidebarHeader({
   className?: string;
 }) {
   return (
-    <header className={cn("h-16 border-b bg-card px-4 flex items-center justify-between sticky top-0 z-30", className)}>
+    <header
+      className={cn(
+        'h-16 border-b bg-card px-4 flex items-center justify-between sticky top-0 z-30',
+        className
+      )}
+    >
       {children}
     </header>
   );

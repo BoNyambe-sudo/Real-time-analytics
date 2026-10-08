@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { AlertList } from "@/components/alerts/alert-list"
+import { AlertList } from '@/components/alerts/alert-list';
 
 export default function AlertsPage() {
-  return <AlertList />
+  return <AlertList />;
 }

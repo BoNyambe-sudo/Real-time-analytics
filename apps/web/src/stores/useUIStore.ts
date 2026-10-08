@@ -1,4 +1,4 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 
 interface UIState {
   sidebarOpen: boolean;
@@ -6,8 +6,8 @@ interface UIState {
   toggleSidebar: () => void;
 }
 
-export const useUIStore = create<UIState>((set) => ({
+export const useUIStore = create<UIState>(set => ({
   sidebarOpen: true,
-  setSidebarOpen: (sidebarOpen) => set({ sidebarOpen }),
-  toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+  setSidebarOpen: sidebarOpen => set({ sidebarOpen }),
+  toggleSidebar: () => set(state => ({ sidebarOpen: !state.sidebarOpen })),
 }));

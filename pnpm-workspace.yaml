@@ -1,7 +1,7 @@
 packages:
-  - "apps/*"
-  - "packages/*"
-  - "loadtest"
+  - 'apps/*'
+  - 'packages/*'
+  - 'loadtest'
 allowBuilds:
   '@scarf/scarf': true
   bcrypt: true

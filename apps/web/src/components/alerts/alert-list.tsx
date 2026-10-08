@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, AlertTriangle, Loader2, Bell } from "lucide-react";
-import { toast } from "sonner";
+import { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { CheckCircle2, AlertTriangle, Loader2, Bell } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface Alert {
   _id: string;
@@ -22,11 +22,15 @@ export function AlertList() {
   const queryClient = useQueryClient();
   const [acknowledgingId, setAcknowledgingId] = useState<string | null>(null);
 
-  const { data: alerts = [], isLoading, refetch } = useQuery<Alert[]>({
-    queryKey: ["alerts"],
+  const {
+    data: alerts = [],
+    isLoading,
+    refetch,
+  } = useQuery<Alert[]>({
+    queryKey: ['alerts'],
     queryFn: async () => {
-      const res = await fetch("/api/alerts", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch alerts");
+      const res = await fetch('/api/alerts', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch alerts');
       return res.json();
     },
     refetchInterval: 30000,
@@ -35,21 +39,21 @@ export function AlertList() {
   const acknowledgeMutation = useMutation({
     mutationFn: async (id: string) => {
       const res = await fetch(`/api/alerts/${id}/acknowledge`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id }),
-        credentials: "include",
+        credentials: 'include',
       });
-      if (!res.ok) throw new Error("Failed to acknowledge alert");
+      if (!res.ok) throw new Error('Failed to acknowledge alert');
       return res.json();
     },
     onSuccess: () => {
-      toast.success("Alert acknowledged");
-      queryClient.invalidateQueries({ queryKey: ["alerts"] });
+      toast.success('Alert acknowledged');
+      queryClient.invalidateQueries({ queryKey: ['alerts'] });
       setAcknowledgingId(null);
     },
     onError: () => {
-      toast.error("Failed to acknowledge alert");
+      toast.error('Failed to acknowledge alert');
       setAcknowledgingId(null);
     },
   });
@@ -75,9 +79,7 @@ export function AlertList() {
         <CardContent className="py-12 text-center">
           <Bell className="h-12 w-12 text-primary mx-auto mb-4" />
           <h3 className="text-lg font-medium">No alerts</h3>
-          <p className="text-muted-foreground">
-            All systems operating normally
-          </p>
+          <p className="text-muted-foreground">All systems operating normally</p>
         </CardContent>
       </Card>
     );
@@ -96,14 +98,18 @@ export function AlertList() {
                     <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
                     <span className="font-medium truncate">{alert.message}</span>
                     {!alert.acknowledgedAt && (
-                      <Badge variant="destructive" className="flex-shrink-0">Active</Badge>
+                      <Badge variant="destructive" className="flex-shrink-0">
+                        Active
+                      </Badge>
                     )}
                     {alert.acknowledgedAt && (
-                      <Badge variant="secondary" className="flex-shrink-0">Acknowledged</Badge>
+                      <Badge variant="secondary" className="flex-shrink-0">
+                        Acknowledged
+                      </Badge>
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Value: {alert.value}% • Threshold: {alert.threshold}% •{" "}
+                    Value: {alert.value}% • Threshold: {alert.threshold}% •{' '}
                     {new Date(alert.ts).toLocaleString()}
                   </p>
                 </div>

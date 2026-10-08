@@ -52,16 +52,16 @@ pnpm dev
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start web + server in dev mode |
-| `pnpm build` | Build all packages |
-| `pnpm lint` | Run linters |
-| `pnpm typecheck` | TypeScript type checking |
-| `pnpm test` | Run unit tests |
-| `pnpm seed` | Seed DB with demo data |
-| `pnpm dev:web` | Start only Next.js |
-| `pnpm dev:server` | Start only NestJS |
+| Command           | Description                    |
+| ----------------- | ------------------------------ |
+| `pnpm dev`        | Start web + server in dev mode |
+| `pnpm build`      | Build all packages             |
+| `pnpm lint`       | Run linters                    |
+| `pnpm typecheck`  | TypeScript type checking       |
+| `pnpm test`       | Run unit tests                 |
+| `pnpm seed`       | Seed DB with demo data         |
+| `pnpm dev:web`    | Start only Next.js             |
+| `pnpm dev:server` | Start only NestJS              |
 
 ## Load Testing
 

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useVirtualizer } from "@tanstack/react-virtual";
-import { useState, useCallback, useEffect, useRef } from "react";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { useVirtualizer } from '@tanstack/react-virtual';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import {
   Table,
   TableHeader,
@@ -10,24 +10,24 @@ import {
   TableRow,
   TableHead,
   TableCell,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Filter, ChevronDown, ChevronUp, Loader2 } from "lucide-react";
-import { useDebouncedValue } from "@/hooks/useDebouncedValue";
-import { cn } from "@/lib/utils";
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Search, Filter, ChevronDown, ChevronUp, Loader2 } from 'lucide-react';
+import { useDebouncedValue } from '@/hooks/useDebouncedValue';
+import { cn } from '@/lib/utils';
 
 const LEVEL_COLORS: Record<string, string> = {
-  info: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  warn: "bg-amber-500/20 text-amber-400 border-amber-500/30",
-  error: "bg-red-500/20 text-red-400 border-red-500/30",
+  info: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
+  warn: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+  error: 'bg-red-500/20 text-red-400 border-red-500/30',
 };
 
 interface LogEntry {
   ts: string;
-  level: "info" | "warn" | "error";
+  level: 'info' | 'warn' | 'error';
   message: string;
   path: string;
   statusCode: number;
@@ -41,33 +41,32 @@ interface LogsResponse {
 }
 
 export function LogsTable() {
-  const [search, setSearch] = useState("");
-  const [level, setLevel] = useState<"info" | "warn" | "error" | "">("");
-  const [sort, setSort] = useState<"asc" | "desc">("desc");
+  const [search, setSearch] = useState('');
+  const [level, setLevel] = useState<'info' | 'warn' | 'error' | ''>('');
+  const [sort, setSort] = useState<'asc' | 'desc'>('desc');
   const debouncedSearch = useDebouncedValue(search, 300);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery<LogsResponse>({
-      queryKey: ["logs", debouncedSearch, level, sort],
+      queryKey: ['logs', debouncedSearch, level, sort],
       queryFn: async ({ pageParam }) => {
         const params = new URLSearchParams();
-        if (pageParam && typeof pageParam === "string") params.set("cursor", pageParam);
-        params.set("limit", "50");
-        params.set("sort", sort);
-        if (level) params.set("level", level);
-        if (debouncedSearch) params.set("q", debouncedSearch);
+        if (pageParam && typeof pageParam === 'string') params.set('cursor', pageParam);
+        params.set('limit', '50');
+        params.set('sort', sort);
+        if (level) params.set('level', level);
+        if (debouncedSearch) params.set('q', debouncedSearch);
         const res = await fetch(`/api/logs?${params.toString()}`, {
-          credentials: "include",
+          credentials: 'include',
         });
-        if (!res.ok) throw new Error("Failed to fetch logs");
+        if (!res.ok) throw new Error('Failed to fetch logs');
         return res.json();
       },
       initialPageParam: undefined as string | undefined,
-      getNextPageParam: (lastPage) =>
-        lastPage.hasMore ? lastPage.nextCursor : undefined,
+      getNextPageParam: lastPage => (lastPage.hasMore ? lastPage.nextCursor : undefined),
     });
 
-  const logs = data?.pages.flatMap((p) => p.data) || [];
+  const logs = data?.pages.flatMap(p => p.data) || [];
 
   const parentRef = useRef<HTMLDivElement>(null);
   const virtualizer = useVirtualizer({
@@ -77,7 +76,7 @@ export function LogsTable() {
     overscan: 20,
   });
 
-  const handleSort = () => setSort((s) => (s === "asc" ? "desc" : "asc"));
+  const handleSort = () => setSort(s => (s === 'asc' ? 'desc' : 'asc'));
 
   if (isLoading) {
     return (
@@ -140,14 +139,14 @@ export function LogsTable() {
           <Input
             placeholder="Search logs..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={e => setSearch(e.target.value)}
             className="pl-10"
           />
         </div>
         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <select
             value={level}
-            onChange={(e) => setLevel(e.target.value as "info" | "warn" | "error" | "")}
+            onChange={e => setLevel(e.target.value as 'info' | 'warn' | 'error' | '')}
             className="border rounded-md px-3 py-2 text-sm bg-background w-full sm:w-auto"
           >
             <option value="">All Levels</option>
@@ -159,10 +158,10 @@ export function LogsTable() {
             variant="outline"
             size="icon"
             onClick={handleSort}
-            title={sort === "asc" ? "Sort ascending" : "Sort descending"}
+            title={sort === 'asc' ? 'Sort ascending' : 'Sort descending'}
             className="w-full sm:w-auto"
           >
-            {sort === "asc" ? (
+            {sort === 'asc' ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
               <ChevronDown className="h-4 w-4" />
@@ -172,10 +171,7 @@ export function LogsTable() {
         </div>
       </div>
 
-      <div
-        ref={parentRef}
-        className="h-[600px] overflow-auto border rounded-lg bg-background"
-      >
+      <div ref={parentRef} className="h-[600px] overflow-auto border rounded-lg bg-background">
         <Table>
           <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm z-10">
             <TableRow>
@@ -188,12 +184,12 @@ export function LogsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {virtualizer.getVirtualItems().map((virtualRow) => {
+            {virtualizer.getVirtualItems().map(virtualRow => {
               const log = logs[virtualRow.index];
               return (
                 <TableRow
                   key={virtualRow.index}
-                  style={{ 
+                  style={{
                     transform: `translateY(${virtualRow.start}px)`,
                     height: '48px',
                   }}
@@ -203,16 +199,11 @@ export function LogsTable() {
                     {new Date(log.ts).toLocaleTimeString()}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant="outline"
-                      className={LEVEL_COLORS[log.level]}
-                    >
+                    <Badge variant="outline" className={LEVEL_COLORS[log.level]}>
                       {log.level.toUpperCase()}
                     </Badge>
                   </TableCell>
-                  <TableCell className="max-w-[400px] truncate">
-                    {log.message}
-                  </TableCell>
+                  <TableCell className="max-w-[400px] truncate">{log.message}</TableCell>
                   <TableCell className="font-mono text-xs hidden md:table-cell">
                     {log.path}
                   </TableCell>
@@ -232,15 +223,9 @@ export function LogsTable() {
 
       {hasNextPage && (
         <div className="flex justify-center">
-          <Button
-            variant="outline"
-            onClick={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-          >
-            {isFetchingNextPage ? (
-              <Loader2 className="h-4 w-4 animate-spin mr-2" />
-            ) : null}{" "}
-            Load more
+          <Button variant="outline" onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+            {isFetchingNextPage ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : null} Load
+            more
           </Button>
         </div>
       )}
