@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { MetricModel } from '../schemas/metric.schema.js';
-import { REDIS_CLIENT } from '../redis/redis.module.js';
+import { REDIS_CLIENT } from '../redis/redis.tokens.js';
 import { Redis } from '@upstash/redis';
 
 const CACHE_TTL = 5;

@@ -1,6 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { ThrottlerStorage } from '@nestjs/throttler';
-import { REDIS_CLIENT } from './redis.module.js';
+import { REDIS_CLIENT } from './redis.tokens.js';
 import { Redis } from '@upstash/redis';
 
 export interface ThrottlerStorageRecord {

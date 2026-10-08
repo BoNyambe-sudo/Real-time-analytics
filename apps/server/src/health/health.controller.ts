@@ -1,6 +1,6 @@
 import { Controller, Get, Inject } from '@nestjs/common';
 import { RedisHealthService } from '../redis/redis-health.service.js';
-import { REDIS_CLIENT } from '../redis/redis.module.js';
+import { REDIS_CLIENT } from '../redis/redis.tokens.js';
 import { Redis } from '@upstash/redis';
 
 @Controller('health')

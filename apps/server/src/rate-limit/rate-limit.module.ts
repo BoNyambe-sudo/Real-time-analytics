@@ -3,7 +3,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { ConfigService } from '@nestjs/config';
 import { UpstashThrottlerStorage } from '../redis/upstash-throttler-storage.js';
 import { InMemoryThrottlerStorage } from '../redis/in-memory-throttler-storage.js';
-import { REDIS_CLIENT } from '../redis/redis.module.js';
+import { REDIS_CLIENT } from '../redis/redis.tokens.js';
 import { Redis } from '@upstash/redis';
 import { ThrottlerStorageModule } from './throttler-storage.module.js';
 

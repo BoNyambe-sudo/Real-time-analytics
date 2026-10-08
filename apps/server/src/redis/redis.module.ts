@@ -2,8 +2,7 @@ import { Global, Module, Provider } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Redis } from '@upstash/redis';
 import { RedisHealthService } from './redis-health.service.js';
-
-export const REDIS_CLIENT = Symbol('REDIS_CLIENT');
+import { REDIS_CLIENT } from './redis.tokens.js';
 
 const createRedisProvider = (): Provider => ({
   provide: REDIS_CLIENT,
@@ -22,3 +21,5 @@ const createRedisProvider = (): Provider => ({
   exports: [REDIS_CLIENT, RedisHealthService],
 })
 export class RedisModule {}
+
+export { REDIS_CLIENT } from './redis.tokens.js';
