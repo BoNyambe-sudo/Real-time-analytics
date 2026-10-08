@@ -1,7 +1,6 @@
 import { Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 import { ScheduleModule } from "@nestjs/schedule"
-import { ThrottlerModule } from "@nestjs/throttler"
 import { MongooseModule } from "./database/mongoose.module.js"
 import { MetricsModule } from "./metrics/metrics.module.js"
 import { LogsModule } from "./logs/logs.module.js"

@@ -13,7 +13,6 @@ const __dirname = dirname(__filename)
 // Load env from root directory
 config({ path: join(__dirname, "..", "..", "..", ".env") })
 
-import { MONGOOSE_CONNECTION } from "./database/mongoose.module.js"
 import { UserModel } from "./schemas/user.schema.js"
 import { OrganizationModel } from "./schemas/organization.schema.js"
 import { EventLogModel } from "./schemas/event-log.schema.js"

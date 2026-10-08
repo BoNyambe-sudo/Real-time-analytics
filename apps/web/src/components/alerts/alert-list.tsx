@@ -1,10 +1,10 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, AlertTriangle, Loader2 } from "lucide-react";
+import { CheckCircle2, AlertTriangle, Loader2, Bell } from "lucide-react";
 import { toast } from "sonner";
 
 interface Alert {
@@ -18,7 +18,9 @@ interface Alert {
 }
 
 export function AlertList() {
-  const { data: alerts = [], refetch } = useQuery({
+  const queryClient = useQueryClient();
+
+  const { data: alerts = [], isLoading, refetch } = useQuery<Alert[]>({
     queryKey: ["alerts"],
     queryFn: async () => {
       const res = await fetch("/api/alerts", { credentials: "include" });
@@ -28,24 +30,45 @@ export function AlertList() {
     refetchInterval: 30000,
   });
 
-  const handleAcknowledge = async (id: string) => {
-    const res = await fetch(`/api/alerts/${id}/acknowledge`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
-      credentials: "include",
-    });
-    if (res.ok) {
+  const acknowledgeMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/alerts/${id}/acknowledge`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+        credentials: "include",
+      });
+      if (!res.ok) throw new Error("Failed to acknowledge alert");
+      return res.json();
+    },
+    onSuccess: () => {
       toast.success("Alert acknowledged");
-      refetch();
-    } else toast.error("Failed to acknowledge");
+      queryClient.invalidateQueries({ queryKey: ["alerts"] });
+    },
+    onError: () => {
+      toast.error("Failed to acknowledge alert");
+    },
+  });
+
+  const handleAcknowledge = (id: string) => {
+    acknowledgeMutation.mutate(id);
   };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="py-12 text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   if (alerts.length === 0) {
     return (
       <Card>
         <CardContent className="py-12 text-center">
-          <CheckCircle2 className="h-12 w-12 text-green-500 mx-auto mb-4" />
+          <Bell className="h-12 w-12 text-primary mx-auto mb-4" />
           <h3 className="text-lg font-medium">No alerts</h3>
           <p className="text-muted-foreground">
             All systems operating normally
@@ -62,14 +85,14 @@ export function AlertList() {
           <CardContent className="pt-6">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="h-5 w-5 text-destructive" />
-                  <span className="font-medium">{alert.message}</span>
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
+                  <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0" />
+                  <span className="font-medium truncate">{alert.message}</span>
                   {!alert.acknowledgedAt && (
-                    <Badge variant="destructive">Active</Badge>
+                    <Badge variant="destructive" className="flex-shrink-0">Active</Badge>
                   )}
                   {alert.acknowledgedAt && (
-                    <Badge variant="secondary">Acknowledged</Badge>
+                    <Badge variant="secondary" className="flex-shrink-0">Acknowledged</Badge>
                   )}
                 </div>
                 <p className="text-sm text-muted-foreground">
@@ -78,8 +101,20 @@ export function AlertList() {
                 </p>
               </div>
               {!alert.acknowledgedAt && (
-                <Button size="sm" onClick={() => handleAcknowledge(alert._id)}>
-                  <CheckCircle2 className="h-4 w-4 mr-2" /> Acknowledge
+                <Button
+                  size="sm"
+                  onClick={() => handleAcknowledge(alert._id)}
+                  disabled={acknowledgeMutation.isPending}
+                  className="flex-shrink-0"
+                >
+                  {acknowledgeMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <>
+                      <CheckCircle2 className="h-4 w-4 mr-2" />
+                      Acknowledge
+                    </>
+                  )}
                 </Button>
               )}
             </div>

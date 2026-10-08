@@ -8,6 +8,12 @@ const loginSchema = z.object({
   password: z.string().min(8),
 })
 
+const registerSchema = z.object({
+  name: z.string().min(1).max(120),
+  email: z.email(),
+  password: z.string().min(8),
+})
+
 @Controller("api/auth")
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -17,6 +23,13 @@ export class AuthController {
   async login(@Body() body: unknown) {
     const { email, password } = loginSchema.parse(body)
     return this.authService.validateUser(email, password)
+  }
+
+  @Post("register")
+  @HttpCode(HttpStatus.CREATED)
+  async register(@Body() body: unknown) {
+    const { name, email, password } = registerSchema.parse(body)
+    return this.authService.register(name, email, password)
   }
 
   @UseGuards(AuthGuard)

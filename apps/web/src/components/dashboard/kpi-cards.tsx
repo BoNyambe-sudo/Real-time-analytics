@@ -2,6 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { DollarSign, Users, AlertTriangle, Zap } from "lucide-react";
 
 interface KPICardsProps {
   summary: {
@@ -17,25 +18,25 @@ export function KPICards({ summary }: KPICardsProps) {
     {
       label: "Total Revenue",
       value: summary ? `$${summary.totalRevenue.toLocaleString()}` : "$0",
-      icon: "💰",
+      Icon: DollarSign,
       color: "bg-emerald-500/20 text-emerald-400",
     },
     {
       label: "Active Users",
       value: summary ? summary.activeUsers.toLocaleString() : "0",
-      icon: "👥",
+      Icon: Users,
       color: "bg-blue-500/20 text-blue-400",
     },
     {
       label: "Error Rate",
       value: summary ? `${summary.errorRate.toFixed(1)}%` : "0%",
-      icon: "⚠️",
+      Icon: AlertTriangle,
       color: "bg-amber-500/20 text-amber-400",
     },
     {
       label: "Avg Latency",
       value: summary ? `${summary.latencyMs}ms` : "0ms",
-      icon: "⚡",
+      Icon: Zap,
       color: "bg-purple-500/20 text-purple-400",
     },
   ];
@@ -51,7 +52,7 @@ export function KPICards({ summary }: KPICardsProps) {
                 <p className="text-2xl font-bold mt-1">{card.value}</p>
               </div>
               <div className={cn("p-3 rounded-xl", card.color)}>
-                <span className="text-2xl">{card.icon}</span>
+                <card.Icon className="h-6 w-6" />
               </div>
             </div>
           </CardContent>

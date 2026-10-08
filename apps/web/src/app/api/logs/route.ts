@@ -12,11 +12,12 @@ function headers(): Record<string, string> {
 
 export async function GET(req: Request) {
   const session = await auth();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
+  if (!session?.user?.orgId) return new NextResponse("Unauthorized", { status: 401 });
 
   const { searchParams } = new URL(req.url);
   const res = await fetch(`${SERVER_URL}/api/logs?${searchParams.toString()}`, {
     headers: headers(),
+    credentials: "include"
   });
   if (!res.ok)
     return new NextResponse("Failed to fetch", { status: res.status });

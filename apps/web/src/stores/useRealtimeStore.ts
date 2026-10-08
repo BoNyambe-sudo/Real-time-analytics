@@ -1,6 +1,25 @@
 import { create } from "zustand";
 import { subscribeWithSelector } from "zustand/middleware";
 
+interface MetricDataPoint {
+  ts: string;
+  activeUsers: number;
+  requestsPerSec: number;
+  revenue: number;
+  errorRate: number;
+  latencyMs: number;
+}
+
+interface AlertData {
+  _id: string;
+  type: string;
+  message: string;
+  value: number;
+  threshold: number;
+  ts: string;
+  acknowledgedAt?: string;
+}
+
 interface RealtimeState {
   connectionStatus: "connecting" | "connected" | "disconnected" | "error";
   latency: number;
@@ -10,14 +29,14 @@ interface RealtimeState {
     errorRate: number;
     latencyMs: number;
   } | null;
-  timeseries: any[];
-  alerts: any[];
+  timeseries: MetricDataPoint[];
+  alerts: AlertData[];
   setConnectionStatus: (status: RealtimeState["connectionStatus"]) => void;
   setLatency: (latency: number) => void;
   setSummary: (summary: RealtimeState["summary"]) => void;
-  setTimeseries: (timeseries: any[]) => void;
-  addTimeseries: (points: any[]) => void;
-  addAlert: (alert: any) => void;
+  setTimeseries: (timeseries: MetricDataPoint[]) => void;
+  addTimeseries: (points: MetricDataPoint[]) => void;
+  addAlert: (alert: AlertData) => void;
   clearAlerts: () => void;
 }
 

@@ -12,9 +12,12 @@ function headers(): Record<string, string> {
 
 export async function GET(req: Request) {
   const session = await auth();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
+  if (!session?.user?.orgId) return new NextResponse("Unauthorized", { status: 401 });
 
-  const res = await fetch(`${SERVER_URL}/api/alerts`, { headers: headers() });
+  const res = await fetch(`${SERVER_URL}/api/alerts`, { 
+    headers: headers(),
+    credentials: "include"
+  });
   if (!res.ok)
     return new NextResponse("Failed to fetch", { status: res.status });
 
@@ -24,12 +27,13 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   const session = await auth();
-  if (!session) return new NextResponse("Unauthorized", { status: 401 });
+  if (!session?.user?.orgId) return new NextResponse("Unauthorized", { status: 401 });
 
   const body = await req.json();
   const res = await fetch(`${SERVER_URL}/api/alerts/${body.id}/acknowledge`, {
     method: "PATCH",
     headers: headers(),
+    credentials: "include",
     body: JSON.stringify(body),
   });
   if (!res.ok)

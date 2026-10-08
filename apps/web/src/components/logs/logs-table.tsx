@@ -2,7 +2,7 @@
 
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import {
   Table,
   TableHeader,
@@ -20,9 +20,9 @@ import { useDebouncedValue } from "@/hooks/useDebouncedValue";
 import { cn } from "@/lib/utils";
 
 const LEVEL_COLORS: Record<string, string> = {
-  info: "bg-blue-500/20 text-blue-400",
-  warn: "bg-amber-500/20 text-amber-400",
-  error: "bg-red-500/20 text-red-400",
+  info: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  warn: "bg-amber-500/20 text-amber-400 border-amber-500/30",
+  error: "bg-red-500/20 text-red-400 border-red-500/30",
 };
 
 interface LogEntry {
@@ -34,6 +34,12 @@ interface LogEntry {
   latencyMs: number;
 }
 
+interface LogsResponse {
+  data: LogEntry[];
+  nextCursor?: string;
+  hasMore: boolean;
+}
+
 export function LogsTable() {
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState<"info" | "warn" | "error" | "">("");
@@ -41,11 +47,11 @@ export function LogsTable() {
   const debouncedSearch = useDebouncedValue(search, 300);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery({
+    useInfiniteQuery<LogsResponse>({
       queryKey: ["logs", debouncedSearch, level, sort],
       queryFn: async ({ pageParam }) => {
         const params = new URLSearchParams();
-        if (pageParam) params.set("cursor", pageParam);
+        if (pageParam && typeof pageParam === "string") params.set("cursor", pageParam);
         params.set("limit", "50");
         params.set("sort", sort);
         if (level) params.set("level", level);
@@ -116,10 +122,20 @@ export function LogsTable() {
     );
   }
 
+  if (logs.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[400px] text-center text-muted-foreground">
+        <Filter className="h-12 w-12 mb-4 opacity-50" />
+        <h3 className="text-lg font-medium mb-1">No logs found</h3>
+        <p className="text-sm">Try adjusting your filters or search query</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-4">
-        <div className="relative flex-1 min-w-[250px]">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="relative flex-1 min-w-0">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search logs..."
@@ -128,11 +144,11 @@ export function LogsTable() {
             className="pl-10"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
           <select
             value={level}
-            onChange={(e) => setLevel(e.target.value as any)}
-            className="border rounded-md px-3 py-2 text-sm bg-background"
+            onChange={(e) => setLevel(e.target.value as "info" | "warn" | "error" | "")}
+            className="border rounded-md px-3 py-2 text-sm bg-background w-full sm:w-auto"
           >
             <option value="">All Levels</option>
             <option value="info">Info</option>
@@ -144,12 +160,14 @@ export function LogsTable() {
             size="icon"
             onClick={handleSort}
             title={sort === "asc" ? "Sort ascending" : "Sort descending"}
+            className="w-full sm:w-auto"
           >
             {sort === "asc" ? (
               <ChevronUp className="h-4 w-4" />
             ) : (
               <ChevronDown className="h-4 w-4" />
             )}
+            <span className="hidden sm:inline ml-1">Sort</span>
           </Button>
         </div>
       </div>
@@ -161,41 +179,44 @@ export function LogsTable() {
         <Table>
           <TableHeader className="sticky top-0 bg-card/95 backdrop-blur-sm z-10">
             <TableRow>
-              <TableHead className="w-32">Time</TableHead>
+              <TableHead className="w-32 hidden sm:table-cell">Time</TableHead>
               <TableHead className="w-24">Level</TableHead>
               <TableHead>Message</TableHead>
-              <TableHead className="w-48">Path</TableHead>
-              <TableHead className="w-24">Status</TableHead>
-              <TableHead className="w-24">Latency</TableHead>
+              <TableHead className="w-48 hidden md:table-cell">Path</TableHead>
+              <TableHead className="w-24 hidden sm:table-cell">Status</TableHead>
+              <TableHead className="w-24 hidden sm:table-cell">Latency</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {virtualizer.getVirtualItems().map((virtualRow) => (
-              <TableRow
-                key={virtualRow.index}
-                style={{ transform: `translateY(${virtualRow.start}px)` }}
-              >
-                <TableCell className="font-mono text-xs">
-                  {new Date(logs[virtualRow.index].ts).toLocaleTimeString()}
-                </TableCell>
-                <TableCell>
-                  <Badge
-                    variant="outline"
-                    className={LEVEL_COLORS[logs[virtualRow.index].level]}
-                  >
-                    {logs[virtualRow.index].level.toUpperCase()}
-                  </Badge>
-                </TableCell>
-                <TableCell className="max-w-[400px] truncate">
-                  {logs[virtualRow.index].message}
-                </TableCell>
-                <TableCell className="font-mono text-xs">
-                  {logs[virtualRow.index].path}
-                </TableCell>
-                <TableCell>{logs[virtualRow.index].statusCode}</TableCell>
-                <TableCell>{logs[virtualRow.index].latencyMs}ms</TableCell>
-              </TableRow>
-            ))}
+            {virtualizer.getVirtualItems().map((virtualRow) => {
+              const log = logs[virtualRow.index];
+              return (
+                <TableRow
+                  key={virtualRow.index}
+                  style={{ transform: `translateY(${virtualRow.start}px)` }}
+                >
+                  <TableCell className="font-mono text-xs hidden sm:table-cell">
+                    {new Date(log.ts).toLocaleTimeString()}
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant="outline"
+                      className={LEVEL_COLORS[log.level]}
+                    >
+                      {log.level.toUpperCase()}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="max-w-[400px] truncate">
+                    {log.message}
+                  </TableCell>
+                  <TableCell className="font-mono text-xs hidden md:table-cell">
+                    {log.path}
+                  </TableCell>
+                  <TableCell className="hidden sm:table-cell">{log.statusCode}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{log.latencyMs}ms</TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
         {isFetchingNextPage && (

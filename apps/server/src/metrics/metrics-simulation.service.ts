@@ -5,7 +5,6 @@ import { OrganizationModel } from "../schemas/organization.schema.js"
 import { AlertService } from "../alerts/alert.service.js"
 import { MetricsGateway } from "../gateway/metrics.gateway.js"
 import { MONGOOSE_CONNECTION } from "../database/mongoose.module.js"
-import type { Model } from "mongoose"
 
 interface Org { _id: any }
 

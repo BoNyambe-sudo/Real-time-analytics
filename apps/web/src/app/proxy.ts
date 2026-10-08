@@ -1,7 +1,8 @@
 import { auth } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import type { NextAuthRequest } from "next-auth";
 
-export default auth((req) => {
+const authMiddleware = auth((req: NextAuthRequest) => {
   const isLoggedIn = !!req.auth;
   const isOnDashboard = req.nextUrl.pathname.startsWith("/dashboard");
   const isOnSettings = req.nextUrl.pathname.startsWith("/settings");
@@ -26,6 +27,8 @@ export default auth((req) => {
 
   return NextResponse.next();
 });
+
+export default authMiddleware as any;
 
 export const config = {
   matcher: [

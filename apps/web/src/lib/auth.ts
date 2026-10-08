@@ -2,6 +2,8 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { NextAuthResult } from "next-auth";
 import { loginSchema } from "@realtime/shared";
+import type { Session, User } from "next-auth";
+import type { JWT } from "next-auth/jwt";
 
 const nextAuthConfig = {
   trustHost: true,
@@ -42,7 +44,7 @@ const nextAuthConfig = {
     }),
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
         token.sub = user.id;
         token.name = user.name;
@@ -52,7 +54,7 @@ const nextAuthConfig = {
       }
       return token;
     },
-    async session({ session, token }) {
+    async session({ session, token }: { session: Session; token: JWT }) {
       const t = token as {
         sub?: string;
         name?: string | null;
@@ -75,9 +77,9 @@ const nextAuthConfig = {
 const nextAuthResult = NextAuth(nextAuthConfig);
 
 export const handlers = nextAuthResult.handlers;
-export const signIn = nextAuthResult.signIn;
-export const signOut = nextAuthResult.signOut;
-export const auth = nextAuthResult.auth;
+export const signIn: NextAuthResult["signIn"] = nextAuthResult.signIn;
+export const signOut: NextAuthResult["signOut"] = nextAuthResult.signOut;
+export const auth: NextAuthResult["auth"] = nextAuthResult.auth;
 
 declare module "next-auth" {
   interface Session {

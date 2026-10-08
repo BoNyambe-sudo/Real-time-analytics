@@ -1,10 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { MetricsSimulationService } from "../metrics/metrics-simulation.service.js"
-import { AlertService } from "../alerts/alert.service.js"
-import { MetricsGateway } from "../gateway/metrics.gateway.js"
 import { MetricModel } from "../schemas/metric.schema.js"
 import { OrganizationModel } from "../schemas/organization.schema.js"
-import { MONGOOSE_CONNECTION } from "../database/mongoose.module.js"
 
 describe("MetricsSimulationService", () => {
   let service: MetricsSimulationService
@@ -53,9 +50,9 @@ describe("MetricsSimulationService", () => {
 
   it("should trigger alert when errorRate > 5%", async () => {
     // Mock MetricModel.insertMany to capture the batch
-    let capturedBatch: any[] = []
+    let _capturedBatch: any[] = []
     vi.spyOn(MetricModel, "insertMany").mockImplementation(async (batch: any[]) => {
-      capturedBatch = batch
+      _capturedBatch = batch
       return []
     })
 

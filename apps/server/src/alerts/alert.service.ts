@@ -1,6 +1,5 @@
 import { Injectable } from "@nestjs/common"
 import { AlertModel } from "../schemas/alert.schema.js"
-import { MetricModel } from "../schemas/metric.schema.js"
 
 export interface AlertDoc {
   _id: any

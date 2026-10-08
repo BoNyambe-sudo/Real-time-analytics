@@ -10,12 +10,45 @@ import { env } from "@/lib/env"
 
 let socket: Socket | null = null
 
-export function useSocket(): { socket: Socket | null; connect: () => void; disconnect: () => void; joinOrg: (orgId: string) => void; leaveOrg: (orgId: string) => void; ping: () => void } {
+interface MetricDataPoint {
+  ts: string
+  activeUsers: number
+  requestsPerSec: number
+  revenue: number
+  errorRate: number
+  latencyMs: number
+}
+
+interface AlertData {
+  _id: string
+  type: string
+  message: string
+  value: number
+  threshold: number
+  ts: string
+  acknowledgedAt?: string
+}
+
+interface ConnectedData {
+  orgId: string
+  latency: number
+}
+
+export function useSocket(): { 
+  socket: Socket | null; 
+  connect: () => void; 
+  disconnect: () => void; 
+  joinOrg: (orgId: string) => void; 
+  leaveOrg: (orgId: string) => void; 
+  ping: () => void 
+} {
   const queryClient = useQueryClient()
   const { data: session } = useSession()
   const { setConnectionStatus, setLatency, setSummary, addTimeseries, addAlert } = useRealtimeStore()
   const reconnectTimeoutRef = useRef<number | null>(null)
   const socketTokenRef = useRef<string | null>(null)
+  const reconnectAttemptsRef = useRef(0)
+  const maxReconnectAttempts = 10
 
   const fetchSocketToken = useCallback(async () => {
     if (!session?.user?.orgId) return null
@@ -35,6 +68,7 @@ export function useSocket(): { socket: Socket | null; connect: () => void; disco
     const token = await fetchSocketToken()
     if (!token) {
       console.warn("No socket token available, skipping connection")
+      setConnectionStatus("error")
       return
     }
     socketTokenRef.current = token
@@ -46,10 +80,12 @@ export function useSocket(): { socket: Socket | null; connect: () => void; disco
       transports: ["polling", "websocket"],
       withCredentials: false,
       query: { token },
+      reconnection: false, // We handle reconnection manually
     })
 
     socket.on("connect", () => {
       setConnectionStatus("connected")
+      reconnectAttemptsRef.current = 0
       console.log("Socket connected")
     })
 
@@ -57,21 +93,37 @@ export function useSocket(): { socket: Socket | null; connect: () => void; disco
       setConnectionStatus("disconnected")
       console.log("Socket disconnected:", reason)
       if (reason === "io server disconnect") return
-      reconnectTimeoutRef.current = window.setTimeout(connect, 2000)
+      
+      // Attempt reconnection with exponential backoff
+      if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+        const delay = Math.min(1000 * 2 ** reconnectAttemptsRef.current, 30000)
+        reconnectAttemptsRef.current++
+        console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})`)
+        reconnectTimeoutRef.current = window.setTimeout(connect, delay)
+      } else {
+        console.error("Max reconnection attempts reached")
+        setConnectionStatus("error")
+      }
     })
 
     socket.on("connect_error", (err) => {
       setConnectionStatus("error")
       console.error("Socket connection error:", err)
-      reconnectTimeoutRef.current = window.setTimeout(connect, 5000)
+      if (reconnectAttemptsRef.current < maxReconnectAttempts) {
+        const delay = Math.min(1000 * 2 ** reconnectAttemptsRef.current, 30000)
+        reconnectAttemptsRef.current++
+        reconnectTimeoutRef.current = window.setTimeout(connect, delay)
+      } else {
+        setConnectionStatus("error")
+      }
     })
 
-    socket.on("connected", (data) => {
+    socket.on("connected", (data: ConnectedData) => {
       if (data.latency >= 0) setLatency(data.latency)
       if (data.orgId) socket?.emit("join:org", { orgId: data.orgId })
     })
 
-    socket.on("metrics", (batch) => {
+    socket.on("metrics", (batch: MetricDataPoint[]) => {
       addTimeseries(batch)
       if (batch.length > 0) {
         const latest = batch[batch.length - 1]
@@ -84,12 +136,15 @@ export function useSocket(): { socket: Socket | null; connect: () => void; disco
       }
     })
 
-    socket.on("alert", (alert) => {
+    socket.on("alert", (alert: AlertData) => {
       addAlert(alert)
-      toast.error(alert.message, { description: `Value: ${alert.value}% (threshold: ${alert.threshold}%)`, duration: 10000 })
+      toast.error(alert.message, { 
+        description: `Value: ${alert.value}% (threshold: ${alert.threshold}%)`, 
+        duration: 10000 
+      })
     })
 
-    socket.on("logs", (logs) => {
+    socket.on("logs", () => {
       queryClient.invalidateQueries({ queryKey: ["logs"] })
     })
   }, [fetchSocketToken, setConnectionStatus, setLatency, setSummary, addTimeseries, addAlert])
@@ -99,6 +154,7 @@ export function useSocket(): { socket: Socket | null; connect: () => void; disco
     socket?.disconnect()
     socket = null
     socketTokenRef.current = null
+    reconnectAttemptsRef.current = 0
     setConnectionStatus("disconnected")
   }, [setConnectionStatus])
 

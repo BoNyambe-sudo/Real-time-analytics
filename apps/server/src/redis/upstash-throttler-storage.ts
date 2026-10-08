@@ -49,9 +49,9 @@ export class UpstashThrottlerStorage implements ThrottlerStorage {
   private fallbackIncrement(
     key: string,
     ttl: number,
-    limit: number,
-    blockDuration: number,
-    throttlerName: string
+    _limit: number,
+    _blockDuration: number,
+    _throttlerName: string
   ): ThrottlerStorageRecord {
     return { totalHits: 0, timeToExpire: Math.ceil(ttl / 1000), isBlocked: false, timeToBlockExpire: 0 }
   }

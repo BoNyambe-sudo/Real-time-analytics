@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { UpstashThrottlerStorage } from "../redis/upstash-throttler-storage.js"
-import { ThrottlerStorageRecord } from "@nestjs/throttler"
 
 describe("UpstashThrottlerStorage", () => {
   let storage: UpstashThrottlerStorage

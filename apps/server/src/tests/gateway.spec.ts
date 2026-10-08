@@ -1,7 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { MetricsGateway } from "../gateway/metrics.gateway.js"
-import { SocketAuthGuard } from "../auth/socket-auth.guard.js"
-import { Server, Socket } from "socket.io"
 import { EventEmitter } from "events"
 
 class MockSocket extends EventEmitter {

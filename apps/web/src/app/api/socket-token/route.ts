@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { SignJWT } from "jose";
 
 const SOCKET_TOKEN_SECRET = new TextEncoder().encode(
-  process.env.AUTH_SECRET || "fallback-secret",
+  process.env.AUTH_SECRET || "fallback-secret-min-32-chars-long",
 );
 
 export async function GET() {

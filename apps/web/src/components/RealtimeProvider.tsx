@@ -14,10 +14,9 @@ export function RealtimeProvider({ children }: { children: React.ReactNode }) {
       connect();
       joinOrg(session.user.orgId);
     }
-    // Don't disconnect on orgId change - let pages handle their own connection logic
-    // Just return cleanup for unmount
     return () => {
       // Don't disconnect here - let pages manage their own connection
+      // This allows the socket to persist across page navigations
     };
   }, [status, session?.user?.orgId, connect, joinOrg]);
 

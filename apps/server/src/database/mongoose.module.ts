@@ -1,5 +1,5 @@
 import { Global, Module } from "@nestjs/common";
-import { ConfigModule, ConfigService } from "@nestjs/config";
+import { ConfigService } from "@nestjs/config";
 import mongoose from "mongoose";
 
 export const MONGOOSE_CONNECTION = Symbol("MONGOOSE_CONNECTION");
