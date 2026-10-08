@@ -11,7 +11,6 @@ export class ApiKeyGuard implements CanActivate {
     const req = context.switchToHttp().getRequest();
     const key = req.headers['x-api-key'] || this.extractBearer(req.headers.authorization);
 
-
     if (!key) {
       return false;
     }

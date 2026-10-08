@@ -7,7 +7,7 @@ import { KPICards } from '@/components/dashboard/kpi-cards';
 import { MetricsCharts } from '@/components/dashboard/metrics-charts';
 import { useSocket } from '@/hooks/useSocket';
 import { useSession } from 'next-auth/react';
-import { useQueryClient } from '@tanstack/react-query';
+//import { useQueryClient } from '@tanstack/react-query';
 
 export default function DashboardPage() {
   const { data: session } = useSession();
@@ -15,7 +15,7 @@ export default function DashboardPage() {
   const { data: timeseries } = useMetricsTimeseries('24h');
   const { connect, joinOrg } = useSocket();
   const realtimeSummary = useRealtimeStore(state => state.summary);
-  const queryClient = useQueryClient();
+  //const queryClient = useQueryClient();
 
   // Connect socket when session is available
   useEffect(() => {

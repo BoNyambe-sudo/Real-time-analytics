@@ -140,7 +140,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   return (
     <RealtimeProvider>
       <SidebarProvider defaultOpen={true} collapsible="icon">
-        <DashboardInner pathname={pathname} children={children} />
+        <DashboardInner pathname={pathname}>{children}</DashboardInner>
       </SidebarProvider>
     </RealtimeProvider>
   );

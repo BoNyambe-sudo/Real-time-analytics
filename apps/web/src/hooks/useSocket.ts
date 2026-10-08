@@ -50,6 +50,7 @@ export function useSocket(): {
   const socketTokenRef = useRef<string | null>(null);
   const reconnectAttemptsRef = useRef(0);
   const maxReconnectAttempts = 10;
+  const connectRef = useRef<() => Promise<void> | null>(null);
 
   const fetchSocketToken = useCallback(async () => {
     if (!session?.user?.orgId) return null;
@@ -100,7 +101,7 @@ export function useSocket(): {
         const delay = Math.min(1000 * 2 ** reconnectAttemptsRef.current, 30000);
         reconnectAttemptsRef.current++;
         console.log(`Reconnecting in ${delay}ms (attempt ${reconnectAttemptsRef.current})`);
-        reconnectTimeoutRef.current = window.setTimeout(connect, delay);
+        reconnectTimeoutRef.current = window.setTimeout(() => connectRef.current?.(), delay);
       } else {
         console.error('Max reconnection attempts reached');
         setConnectionStatus('error');
@@ -113,7 +114,7 @@ export function useSocket(): {
       if (reconnectAttemptsRef.current < maxReconnectAttempts) {
         const delay = Math.min(1000 * 2 ** reconnectAttemptsRef.current, 30000);
         reconnectAttemptsRef.current++;
-        reconnectTimeoutRef.current = window.setTimeout(connect, delay);
+        reconnectTimeoutRef.current = window.setTimeout(() => connectRef.current?.(), delay);
       } else {
         setConnectionStatus('error');
       }
@@ -149,6 +150,11 @@ export function useSocket(): {
       queryClient.invalidateQueries({ queryKey: ['logs'] });
     });
   }, [fetchSocketToken, setConnectionStatus, setLatency, setSummary, addTimeseries, addAlert]);
+
+  // Store connect in ref for use in event handlers (avoids accessing ref during render)
+  useEffect(() => {
+    connectRef.current = connect;
+  }, [connect]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) clearTimeout(reconnectTimeoutRef.current);

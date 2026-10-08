@@ -66,7 +66,7 @@ const integrations = [
 
 async function Header() {
   const session = await auth();
-  
+
   return (
     <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
@@ -117,7 +117,7 @@ async function Header() {
 
 export default async function Home() {
   const session = await auth();
-  
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Header />

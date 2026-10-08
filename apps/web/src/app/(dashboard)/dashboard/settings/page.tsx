@@ -27,10 +27,6 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(false);
   const [newKeyName, setNewKeyName] = useState('');
 
-  useEffect(() => {
-    if (status === 'authenticated') fetchApiKeys();
-  }, [status]);
-
   const fetchApiKeys = async () => {
     try {
       const res = await fetch('/api/api-keys', { credentials: 'include' });
@@ -39,6 +35,11 @@ export default function SettingsPage() {
       console.error('Failed to fetch API keys:', error);
     }
   };
+
+  useEffect(() => {
+    if (status === 'authenticated') fetchApiKeys();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+  }, [status]);
 
   const handleCreateKey = async (e: React.FormEvent) => {
     e.preventDefault();
