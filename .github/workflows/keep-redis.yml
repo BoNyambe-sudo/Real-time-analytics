@@ -3,12 +3,16 @@ on:
   schedule:
     - cron: '0 0 * * 1'
   workflow_dispatch:
+
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Upstash Redis
+        env:
+          UPSTASH_URL: ${{ secrets.UPSTASH_URL }}
+          UPSTASH_TOKEN: ${{ secrets.UPSTASH_TOKEN }}
         run: |
-          curl  -s -X POST ${secrets.UPSTASH_URL} \
-          -H "Authorization: Bearer ${secrets.UPSTASH_TOKEN}" \
+          curl  -s -X POST "$UPSTASH_URL" \
+          -H "Authorization: Bearer $UPSTASH_TOKEN" \
           -d '["PING"]'
